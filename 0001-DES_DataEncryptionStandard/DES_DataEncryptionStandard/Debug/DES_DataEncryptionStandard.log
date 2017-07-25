@@ -1,0 +1,17 @@
+﻿生成启动时间为 2017/7/24 下午 10:52:56。
+     1>项目“J:\密码学\DES_DataEncryptionStandard\DES_DataEncryptionStandard\DES_DataEncryptionStandard.vcxproj”在节点 2 上(Rebuild 个目标)。
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I"J:\密码学\DES_DataEncryptionStandard" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt DES.cpp
+         DES.cpp
+     1>j:\密码学\des_dataencryptionstandard\des_dataencryptionstandard\bool.h(8): error C2059: 语法错误:“常量”
+     1>j:\密码学\des_dataencryptionstandard\des_dataencryptionstandard\bool.h(10): error C2143: 语法错误: 缺少“;”(在“}”的前面)
+     1>j:\密码学\des_dataencryptionstandard\des_dataencryptionstandard\bool.h(10): error C2059: 语法错误:“}”
+     1>j:\密码学\des_dataencryptionstandard\des_dataencryptionstandard\des.cpp(40): error C3861: “gets”: 找不到标识符
+     1>j:\密码学\des_dataencryptionstandard\des_dataencryptionstandard\des.cpp(43): error C3861: “gets”: 找不到标识符
+     1>j:\密码学\des_dataencryptionstandard\des_dataencryptionstandard\des.cpp(53): error C3861: “gets”: 找不到标识符
+     1>j:\密码学\des_dataencryptionstandard\des_dataencryptionstandard\des.cpp(74): error C3861: “gets”: 找不到标识符
+     1>已完成生成项目“J:\密码学\DES_DataEncryptionStandard\DES_DataEncryptionStandard\DES_DataEncryptionStandard.vcxproj”(Rebuild 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:01.03
