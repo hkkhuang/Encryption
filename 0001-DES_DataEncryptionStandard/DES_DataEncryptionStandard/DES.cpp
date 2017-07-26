@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "bool.h"   // 位处理 
-#include "tables.h"
+#include "tables.h" 
 
 //函数原型声明
 void BitsCopy(bool *DatOut, bool *DatIn, int Len);  // 数组复制 
