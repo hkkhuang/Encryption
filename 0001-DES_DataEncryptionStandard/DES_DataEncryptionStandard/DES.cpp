@@ -1,68 +1,68 @@
-/*-------------------------------------------------------
-	  Data Encryption Standard  56Î»ÃÜÔ¿¼ÓÃÜ64Î»Êı¾İ
+ï»¿/*-------------------------------------------------------
+	  Data Encryption Standard  ã€56ä½å¯†é’¥åŠ å¯†64ä½æ•°æ®ã€‘
 --------------------------------------------------------*/
 #include <stdlib.h>
 #include <stdio.h>
-#include "bool.h"   // Î»´¦Àí 
+#include "bool.h"   // ä½å¤„ç† 
 #include "tables.h" 
 
-//º¯ÊıÔ­ĞÍÉùÃ÷
-void BitsCopy(bool *DatOut, bool *DatIn, int Len);  // Êı×é¸´ÖÆ 
+//å‡½æ•°åŸå‹å£°æ˜
+void BitsCopy(bool *DatOut, bool *DatIn, int Len);  // æ•°ç»„å¤åˆ¶ 
 
-void ByteToBit(bool *DatOut, char *DatIn, int Num); // ×Ö½Úµ½Î» 
-void BitToByte(char *DatOut, bool *DatIn, int Num); // Î»µ½×Ö½Ú
+void ByteToBit(bool *DatOut, char *DatIn, int Num); // å­—èŠ‚åˆ°ä½ 
+void BitToByte(char *DatOut, bool *DatIn, int Num); // ä½åˆ°å­—èŠ‚
 
-void BitToHex(char *DatOut, bool *DatIn, int Num);  // ¶ş½øÖÆµ½Ê®Áù½øÖÆ 64Î» to 4*16×Ö·û
-void HexToBit(bool *DatOut, char *DatIn, int Num);  // Ê®Áù½øÖÆµ½¶ş½øÖÆ 
+void BitToHex(char *DatOut, bool *DatIn, int Num);  // äºŒè¿›åˆ¶åˆ°åå…­è¿›åˆ¶ 64ä½ to 4*16å­—ç¬¦
+void HexToBit(bool *DatOut, char *DatIn, int Num);  // åå…­è¿›åˆ¶åˆ°äºŒè¿›åˆ¶ 
 
-void TablePermute(bool *DatOut, bool *DatIn, const char *Table, int Num); // Î»±íÖÃ»»º¯Êı 
-void LoopMove(bool *DatIn, int Len, int Num);       // Ñ­»·×óÒÆ Len³¤¶È NumÒÆ¶¯Î»Êı 
-void Xor(bool *DatA, bool *DatB, int Num);          // Òì»òº¯Êı 
+void TablePermute(bool *DatOut, bool *DatIn, const char *Table, int Num); // ä½è¡¨ç½®æ¢å‡½æ•° 
+void LoopMove(bool *DatIn, int Len, int Num);       // å¾ªç¯å·¦ç§» Lené•¿åº¦ Numç§»åŠ¨ä½æ•° 
+void Xor(bool *DatA, bool *DatB, int Num);          // å¼‚æˆ–å‡½æ•° 
 
-void S_Change(bool DatOut[32], bool DatIn[48]);    // SºĞ±ä»» 
-void F_Change(bool DatIn[32], bool DatKi[48]);     // Fº¯Êı                                  
+void S_Change(bool DatOut[32], bool DatIn[48]);    // Sç›’å˜æ¢ 
+void F_Change(bool DatIn[32], bool DatKi[48]);     // Få‡½æ•°                                  
 
-void SetKey(char KeyIn[8]);                       // ÉèÖÃÃÜÔ¿
-void PlayDes(char MesOut[8], char MesIn[8]);       // Ö´ĞĞDES¼ÓÃÜ
-void KickDes(char MesOut[8], char MesIn[8]);       // Ö´ĞĞDES½âÃÜ 
+void SetKey(char KeyIn[8]);                       // è®¾ç½®å¯†é’¥
+void PlayDes(char MesOut[8], char MesIn[8]);       // æ‰§è¡ŒDESåŠ å¯†
+void KickDes(char MesOut[8], char MesIn[8]);       // æ‰§è¡ŒDESè§£å¯† 
 
 
-//mainÖ÷º¯Êı
+//mainä¸»å‡½æ•°
 int main()
 {
 	int i = 0;
-	char MesHex[16] = { 0 };         // 16¸ö×Ö·ûÊı×éÓÃÓÚ´æ·Å 64Î»16½øÖÆµÄÃÜÎÄ
-	char MyKey[8] = { 0 };           // ³õÊ¼ÃÜÔ¿ 8×Ö½Ú*8
-	char YourKey[8] = { 0 };         // ÊäÈëµÄ½âÃÜÃÜÔ¿ 8×Ö½Ú*8 ´æ´¢ÃÜÔ¿
-	char MyMessage[8] = { 0 };       // ³õÊ¼Ã÷ÎÄ ×î³¤8Î»  ´æ´¢Ã÷ÎÄ
+	char MesHex[16] = { 0 };         // 16ä¸ªå­—ç¬¦æ•°ç»„ç”¨äºå­˜æ”¾ 64ä½16è¿›åˆ¶çš„å¯†æ–‡
+	char MyKey[8] = { 0 };           // åˆå§‹å¯†é’¥ 8å­—èŠ‚*8
+	char YourKey[8] = { 0 };         // è¾“å…¥çš„è§£å¯†å¯†é’¥ 8å­—èŠ‚*8 å­˜å‚¨å¯†é’¥
+	char MyMessage[8] = { 0 };       // åˆå§‹æ˜æ–‡ æœ€é•¿8ä½  å­˜å‚¨æ˜æ–‡
 
 	printf("Welcome! Please input your Message(64 bit):\n");
-	gets(MyMessage);            // µÃµ½Ã÷ÎÄ×Ö·û´®
+	gets(MyMessage);            // å¾—åˆ°æ˜æ–‡å­—ç¬¦ä¸²
 
 	printf("Please input your Secret Key:\n");
-	gets(MyKey);                // µÃµ½ÃÜÔ¿×Ö·û´®
+	gets(MyKey);                // å¾—åˆ°å¯†é’¥å­—ç¬¦ä¸²
 
 
-	while (MyKey[i] != '\0')  // ¼ÆËãÃÜÔ¿³¤¶È
+	while (MyKey[i] != '\0')  // è®¡ç®—å¯†é’¥é•¿åº¦
 	{
 		i++;
 	}
-	while (i != 8) // ²»ÊÇ8 ÌáÊ¾´íÎó È·±£ÃÜÔ¿µÄ³¤¶ÈÊÇ8
+	while (i != 8) // ä¸æ˜¯8 æç¤ºé”™è¯¯ ç¡®ä¿å¯†é’¥çš„é•¿åº¦æ˜¯8
 	{
 		printf("Please input a correct Secret Key!\n");
 		gets(MyKey);
 		i = 0;
-		while (MyKey[i] != '\0')    // ÊäÈëºóÔÙ´Î¼ì²â
+		while (MyKey[i] != '\0')    // è¾“å…¥åå†æ¬¡æ£€æµ‹
 		{
 			i++;
 		}
 	}
 
-	SetKey(MyKey);               // ÉèÖÃÃÜÔ¿ µÃµ½×ÓÃÜÔ¿Ki
+	SetKey(MyKey);               // è®¾ç½®å¯†é’¥ å¾—åˆ°å­å¯†é’¥Ki
 
-	PlayDes(MesHex, MyMessage);   // Ö´ĞĞDES¼ÓÃÜ
+	PlayDes(MesHex, MyMessage);   // æ‰§è¡ŒDESåŠ å¯†
 
-	printf("Your Message is Encrypted!:\n");  // ĞÅÏ¢ÒÑ¼ÓÃÜ
+	printf("Your Message is Encrypted!:\n");  // ä¿¡æ¯å·²åŠ å¯†
 	for (i = 0; i < 16; i++)
 	{
 		printf("%c ", MesHex[i]);
@@ -70,13 +70,13 @@ int main()
 	printf("\n");
 	printf("\n");
 
-	printf("Please input your Secret Key to Deciphering:\n");  // ÇëÊäÈëÃÜÔ¿ÒÔ½âÃÜ
-	gets(YourKey);   // µÃµ½ÃÜÔ¿
-	SetKey(YourKey); // ÉèÖÃÃÜÔ¿
+	printf("Please input your Secret Key to Deciphering:\n");  // è¯·è¾“å…¥å¯†é’¥ä»¥è§£å¯†
+	gets(YourKey);   // å¾—åˆ°å¯†é’¥
+	SetKey(YourKey); // è®¾ç½®å¯†é’¥
 
-	KickDes(MyMessage, MesHex);  // ½âÃÜÊä³öµ½MyMessage
+	KickDes(MyMessage, MesHex);  // è§£å¯†è¾“å‡ºåˆ°MyMessage
 
-	printf("Deciphering Over !!:\n");// ½âÃÜ½áÊø
+	printf("Deciphering Over !!:\n");// è§£å¯†ç»“æŸ
 	for (i = 0; i < 8; i++)
 	{
 		printf("%c ", MyMessage[i]);
@@ -86,9 +86,9 @@ int main()
 }
 
 /*-----------------------------------------------------------
- °ÑDatIn¿ªÊ¼µÄ³¤¶ÈÎ»LenÎ»µÄ¶ş½øÖÆ¸´ÖÆµ½DatOutºó
+ æŠŠDatInå¼€å§‹çš„é•¿åº¦ä½Lenä½çš„äºŒè¿›åˆ¶å¤åˆ¶åˆ°DatOutå
 ------------------------------------------------------------*/
-void BitsCopy(bool *DatOut, bool *DatIn, int Len)     // Êı×é¸´ÖÆ OK 
+void BitsCopy(bool *DatOut, bool *DatIn, int Len)     // æ•°ç»„å¤åˆ¶ OK 
 {
 	int i = 0;
 	for (i = 0; i < Len; i++)
@@ -98,7 +98,7 @@ void BitsCopy(bool *DatOut, bool *DatIn, int Len)     // Êı×é¸´ÖÆ OK
 }
 
 /*-----------------------------------------------------------
- ¡¾×Ö½Ú×ª»»³ÉÎ»º¯Êı¡¿  Ã¿8´Î»»Ò»¸ö×Ö½Ú Ã¿´ÎÏòÓÒÒÆÒ»Î»   ºÍ1ÓëÈ¡×îºóÒ»Î» ¹²64Î»
+ ã€å­—èŠ‚è½¬æ¢æˆä½å‡½æ•°ã€‘  æ¯8æ¬¡æ¢ä¸€ä¸ªå­—èŠ‚ æ¯æ¬¡å‘å³ç§»ä¸€ä½   å’Œ1ä¸å–æœ€åä¸€ä½ å…±64ä½
 ------------------------------------------------------------*/
 void ByteToBit(bool *DatOut, char *DatIn, int Num)       // OK
 {
@@ -110,8 +110,8 @@ void ByteToBit(bool *DatOut, char *DatIn, int Num)       // OK
 }
 
 /*-----------------------------------------------------------
- ¡¾Î»×ª»»³É×Ö½Úº¯Êı¡¿ ×Ö½ÚÊı×éÃ¿8´ÎÒÆÒ»Î»
- Î»Ã¿´ÎÏò×óÒÆ ÓëÉÏÒ»´Î»ò
+ ã€ä½è½¬æ¢æˆå­—èŠ‚å‡½æ•°ã€‘ å­—èŠ‚æ•°ç»„æ¯8æ¬¡ç§»ä¸€ä½
+ ä½æ¯æ¬¡å‘å·¦ç§» ä¸ä¸Šä¸€æ¬¡æˆ–
 -------------------------------------------------------------*/
 void BitToByte(char *DatOut, bool *DatIn, int Num)        // OK
 {
@@ -128,7 +128,7 @@ void BitToByte(char *DatOut, bool *DatIn, int Num)        // OK
 
 
 /*--------------------------------------------------------------
- ¶ş½øÖÆÃÜÎÄ×ª»»ÎªÊ®Áù½øÖÆ  ĞèÒª16¸ö×Ö·û±íÊ¾
+ äºŒè¿›åˆ¶å¯†æ–‡è½¬æ¢ä¸ºåå…­è¿›åˆ¶  éœ€è¦16ä¸ªå­—ç¬¦è¡¨ç¤º
 ---------------------------------------------------------------*/
 void BitToHex(char *DatOut, bool *DatIn, int Num)
 {
@@ -143,25 +143,25 @@ void BitToHex(char *DatOut, bool *DatIn, int Num)
 			+ (DatIn[i * 4 + 2] << 2) + (DatIn[i * 4 + 3] << 3);
 		if ((DatOut[i] % 16)>9)
 		{
-			DatOut[i] = DatOut[i] % 16 + '7';       //  ÓàÊı´óÓÚ9Ê±´¦Àí 10-15 to A-F
-		}                                     //  Êä³ö×Ö·û 
+			DatOut[i] = DatOut[i] % 16 + '7';       //  ä½™æ•°å¤§äº9æ—¶å¤„ç† 10-15 to A-F
+		}                                     //  è¾“å‡ºå­—ç¬¦ 
 		else
 		{
-			DatOut[i] = DatOut[i] % 16 + '0';       //  Êä³ö×Ö·û	   
+			DatOut[i] = DatOut[i] % 16 + '0';       //  è¾“å‡ºå­—ç¬¦	   
 		}
 	}
 
 }
 
 /*---------------------------------------------
- Ê®Áù½øÖÆ×Ö·û×ª¶ş½øÖÆ
+ åå…­è¿›åˆ¶å­—ç¬¦è½¬äºŒè¿›åˆ¶
 ----------------------------------------------*/
 void HexToBit(bool *DatOut, char *DatIn, int Num)
 {
-	int i = 0;                        // ×Ö·ûĞÍÊäÈë 
+	int i = 0;                        // å­—ç¬¦å‹è¾“å…¥ 
 	for (i = 0; i<Num; i++)
 	{
-		if ((DatIn[i / 4])>'9')         //  ´óÓÚ9 
+		if ((DatIn[i / 4])>'9')         //  å¤§äº9 
 		{
 			DatOut[i] = ((DatIn[i / 4] - '7') >> (i % 4)) & 0x01;
 		}
@@ -172,104 +172,104 @@ void HexToBit(bool *DatOut, char *DatIn, int Num)
 	}
 }
 
-// ±íÖÃ»»º¯Êı  OK
-void TablePermute(bool *DatOut, bool *DatIn, const char *Table, int Num)    //¡¾´«Öµ¹ıÀ´¡¿ 
+// è¡¨ç½®æ¢å‡½æ•°  OK
+void TablePermute(bool *DatOut, bool *DatIn, const char *Table, int Num)    //ã€ä¼ å€¼è¿‡æ¥ã€‘ 
 {
 	int i = 0;
 	static bool Temp[256] = { 0 };
-	for (i = 0; i < Num; i++)                // NumÎªÖÃ»»µÄ³¤¶È 
+	for (i = 0; i < Num; i++)                // Numä¸ºç½®æ¢çš„é•¿åº¦ 
 	{
-		Temp[i] = DatIn[Table[i] - 1];   // Ô­À´µÄÊı¾İ°´¶ÔÓ¦µÄ±íÉÏµÄÎ»ÖÃÅÅÁĞ 
+		Temp[i] = DatIn[Table[i] - 1];   // åŸæ¥çš„æ•°æ®æŒ‰å¯¹åº”çš„è¡¨ä¸Šçš„ä½ç½®æ’åˆ— 
 	}
-	BitsCopy(DatOut, Temp, Num);       // °Ñ»º´æTempµÄÖµÊä³ö 
+	BitsCopy(DatOut, Temp, Num);       // æŠŠç¼“å­˜Tempçš„å€¼è¾“å‡º 
 }
 
-// ×ÓÃÜÔ¿µÄÒÆÎ»
-void LoopMove(bool *DatIn, int Len, int Num) // Ñ­»·×óÒÆ LenÊı¾İ³¤¶È NumÒÆ¶¯Î»Êı
+// å­å¯†é’¥çš„ç§»ä½
+void LoopMove(bool *DatIn, int Len, int Num) // å¾ªç¯å·¦ç§» Lenæ•°æ®é•¿åº¦ Numç§»åŠ¨ä½æ•°
 {
-	static bool Temp[256] = { 0 };    // »º´æ   OK
-	BitsCopy(Temp, DatIn, Num);       // ½«Êı¾İ×î×ó±ßµÄNumÎ»(±»ÒÆ³öÈ¥µÄ)´æÈëTemp 
-	BitsCopy(DatIn, DatIn + Num, Len - Num); // ½«Êı¾İ×ó±ß¿ªÊ¼µÄµÚNumÒÆÈëÔ­À´µÄ¿Õ¼ä
-	BitsCopy(DatIn + Len - Num, Temp, Num);  // ½«»º´æÖĞÒÆ³öÈ¥µÄÊı¾İ¼Óµ½×îÓÒ±ß 
+	static bool Temp[256] = { 0 };    // ç¼“å­˜   OK
+	BitsCopy(Temp, DatIn, Num);       // å°†æ•°æ®æœ€å·¦è¾¹çš„Numä½(è¢«ç§»å‡ºå»çš„)å­˜å…¥Temp 
+	BitsCopy(DatIn, DatIn + Num, Len - Num); // å°†æ•°æ®å·¦è¾¹å¼€å§‹çš„ç¬¬Numç§»å…¥åŸæ¥çš„ç©ºé—´
+	BitsCopy(DatIn + Len - Num, Temp, Num);  // å°†ç¼“å­˜ä¸­ç§»å‡ºå»çš„æ•°æ®åŠ åˆ°æœ€å³è¾¹ 
 }
 
-// °´Î»Òì»ò
-void Xor(bool *DatA, bool *DatB, int Num)           // Òì»òº¯Êı
+// æŒ‰ä½å¼‚æˆ–
+void Xor(bool *DatA, bool *DatB, int Num)           // å¼‚æˆ–å‡½æ•°
 {
 	int i = 0;
 	for (i = 0; i < Num; i++)
 	{
-		DatA[i] = DatA[i] ^ DatB[i];                  // Òì»ò 
+		DatA[i] = DatA[i] ^ DatB[i];                  // å¼‚æˆ– 
 	}
 }
 
-// ¡¾SºĞ±ä»»  ¼´Ñ¹Ëõ²Ù×÷¡¿ÊäÈë48Î» Êä³ö32Î» ÓëRiÒì»ò
-void S_Change(bool DatOut[32], bool DatIn[48])     // SºĞ±ä»»
+// ã€Sç›’å˜æ¢  å³å‹ç¼©æ“ä½œã€‘è¾“å…¥48ä½ è¾“å‡º32ä½ ä¸Riå¼‚æˆ–
+void S_Change(bool DatOut[32], bool DatIn[48])     // Sç›’å˜æ¢
 {
-	int i, X, Y;                                    // iÎª8¸öSºĞ 
-	for (i = 0, Y = 0, X = 0; i < 8; i++, DatIn += 6, DatOut += 4)   // Ã¿Ö´ĞĞÒ»´Î,ÊäÈëÊı¾İÆ«ÒÆ6Î»  ¡¾Ã¿6Î»·ÖÒ»×é½øĞĞSºĞ±ä»»¡¿
-	{    										  // Ã¿Ö´ĞĞÒ»´Î,Êä³öÊı¾İÆ«ÒÆ4Î»  ¡¾½«±ä»»¹ıºó²é±íµÃµ½µÄÊı¾İ´æÈëÊä³ö¡¿
-		Y = (DatIn[0] << 1) + DatIn[5];                 // af´ú±íµÚ¼¸ĞĞ
-		X = (DatIn[1] << 3) + (DatIn[2] << 2) + (DatIn[3] << 1) + DatIn[4]; // bcde´ú±íµÚ¼¸ÁĞ
-		ByteToBit(DatOut, &S_Box[i][Y][X], 4);      // °ÑÕÒµ½µÄµãÊı¾İ»»Îª¶ş½øÖÆ	¡¾²éSºĞ¡¿
+	int i, X, Y;                                    // iä¸º8ä¸ªSç›’ 
+	for (i = 0, Y = 0, X = 0; i < 8; i++, DatIn += 6, DatOut += 4)   // æ¯æ‰§è¡Œä¸€æ¬¡,è¾“å…¥æ•°æ®åç§»6ä½  ã€æ¯6ä½åˆ†ä¸€ç»„è¿›è¡ŒSç›’å˜æ¢ã€‘
+	{    										  // æ¯æ‰§è¡Œä¸€æ¬¡,è¾“å‡ºæ•°æ®åç§»4ä½  ã€å°†å˜æ¢è¿‡åæŸ¥è¡¨å¾—åˆ°çš„æ•°æ®å­˜å…¥è¾“å‡ºã€‘
+		Y = (DatIn[0] << 1) + DatIn[5];                 // afä»£è¡¨ç¬¬å‡ è¡Œ
+		X = (DatIn[1] << 3) + (DatIn[2] << 2) + (DatIn[3] << 1) + DatIn[4]; // bcdeä»£è¡¨ç¬¬å‡ åˆ—
+		ByteToBit(DatOut, &S_Box[i][Y][X], 4);      // æŠŠæ‰¾åˆ°çš„ç‚¹æ•°æ®æ¢ä¸ºäºŒè¿›åˆ¶	ã€æŸ¥Sç›’ã€‘
 	}
 }
 
-// Fº¯Êı
-void F_Change(bool DatIn[32], bool DatKi[48]) // Fº¯Êı   ¡¾ÊäÈëµÄÊı¾İ32Î»Êı¾İºÍ48Î»×ÓÃÜÔ¿¡¿
+// Få‡½æ•°
+void F_Change(bool DatIn[32], bool DatKi[48]) // Få‡½æ•°   ã€è¾“å…¥çš„æ•°æ®32ä½æ•°æ®å’Œ48ä½å­å¯†é’¥ã€‘
 {
-	static bool MiR[48] = { 0 };             // ÊäÈë32Î»Í¨¹ıEÑ¡Î»±äÎª48Î»  ¡¾À©Õ¹ÖÃ»»¡¿
-	TablePermute(MiR, DatIn, E_Table, 48);  //²é±í½øĞĞÀ©Õ¹±ä»»  ¡¾E_Table  32Î»µÄR0½øĞĞE±ä»»,À©Îª48Î»Êä³ö (R1~R16)¡¿
-	Xor(MiR, DatKi, 48);                   // ºÍ×ÓÃÜÔ¿Òì»ò   ¡¾Òì»ò À©Õ¹ºóµÄ48Î»Êı¾İÓëÑ¹Ëõºó48Î»ÃÜÔ¿×öÒì»òÔËËã¡¿
-	S_Change(DatIn, MiR);                 // SºĞ±ä»»
-	TablePermute(DatIn, DatIn, P_Table, 32);   // PÖÃ»»ºóÊä³ö
+	static bool MiR[48] = { 0 };             // è¾“å…¥32ä½é€šè¿‡Eé€‰ä½å˜ä¸º48ä½  ã€æ‰©å±•ç½®æ¢ã€‘
+	TablePermute(MiR, DatIn, E_Table, 48);  //æŸ¥è¡¨è¿›è¡Œæ‰©å±•å˜æ¢  ã€E_Table  32ä½çš„R0è¿›è¡ŒEå˜æ¢,æ‰©ä¸º48ä½è¾“å‡º (R1~R16)ã€‘
+	Xor(MiR, DatKi, 48);                   // å’Œå­å¯†é’¥å¼‚æˆ–   ã€å¼‚æˆ– æ‰©å±•åçš„48ä½æ•°æ®ä¸å‹ç¼©å48ä½å¯†é’¥åšå¼‚æˆ–è¿ç®—ã€‘
+	S_Change(DatIn, MiR);                 // Sç›’å˜æ¢
+	TablePermute(DatIn, DatIn, P_Table, 32);   // Pç½®æ¢åè¾“å‡º
 }
 
 
-// ÉèÖÃÃÜÔ¿ »ñÈ¡×ÓÃÜÔ¿Ki 
-void SetKey(char KeyIn[8])               // ÉèÖÃÃÜÔ¿ »ñÈ¡×ÓÃÜÔ¿Ki 
+// è®¾ç½®å¯†é’¥ è·å–å­å¯†é’¥Ki 
+void SetKey(char KeyIn[8])               // è®¾ç½®å¯†é’¥ è·å–å­å¯†é’¥Ki 
 {
 	int i = 0;
-	static bool KeyBit[64] = { 0 };                // ÃÜÔ¿¶ş½øÖÆ´æ´¢¿Õ¼ä 
-	static bool *KiL = &KeyBit[0], *KiR = &KeyBit[28];  // Ç°28,ºó28¹²56
-	ByteToBit(KeyBit, KeyIn, 64);                    // °ÑÃÜÔ¿×ªÎª¶ş½øÖÆ´æÈëKeyBit 
-	TablePermute(KeyBit, KeyBit, PC1_Table, 56);      // PC1±íÖÃ»» 56´Î   ¡¾PC1_Table  ×ÓÃÜÔ¿K(i)µÄ»ñÈ¡¡¿
+	static bool KeyBit[64] = { 0 };                // å¯†é’¥äºŒè¿›åˆ¶å­˜å‚¨ç©ºé—´ 
+	static bool *KiL = &KeyBit[0], *KiR = &KeyBit[28];  // å‰28,å28å…±56
+	ByteToBit(KeyBit, KeyIn, 64);                    // æŠŠå¯†é’¥è½¬ä¸ºäºŒè¿›åˆ¶å­˜å…¥KeyBit 
+	TablePermute(KeyBit, KeyBit, PC1_Table, 56);      // PC1è¡¨ç½®æ¢ 56æ¬¡   ã€PC1_Table  å­å¯†é’¥K(i)çš„è·å–ã€‘
 	for (i = 0; i < 16; i++)
 	{
-		LoopMove(KiL, 28, Move_Table[i]);       // Ç°28Î»×óÒÆ 
-		LoopMove(KiR, 28, Move_Table[i]);	      // ºó28Î»×óÒÆ 
+		LoopMove(KiL, 28, Move_Table[i]);       // å‰28ä½å·¦ç§» 
+		LoopMove(KiR, 28, Move_Table[i]);	      // å28ä½å·¦ç§» 
 		TablePermute(SubKey[i], KeyBit, PC2_Table, 48);
-		// ¶şÎ¬Êı×é SubKey[i]ÎªÃ¿Ò»ĞĞÆğÊ¼µØÖ· 
-		// Ã¿ÒÆÒ»´ÎÎ»½øĞĞPC2ÖÃ»»µÃ Ki 48Î» 
+		// äºŒç»´æ•°ç»„ SubKey[i]ä¸ºæ¯ä¸€è¡Œèµ·å§‹åœ°å€ 
+		// æ¯ç§»ä¸€æ¬¡ä½è¿›è¡ŒPC2ç½®æ¢å¾— Ki 48ä½ 
 	}
 }
-//Ö´ĞĞDES¼ÓÃÜËã·¨
-void PlayDes(char MesOut[8], char MesIn[8])  // Ö´ĞĞDES¼ÓÃÜ
-{                                           // ×Ö½ÚÊäÈë BinÔËËã HexÊä³ö 
+//æ‰§è¡ŒDESåŠ å¯†ç®—æ³•
+void PlayDes(char MesOut[8], char MesIn[8])  // æ‰§è¡ŒDESåŠ å¯†
+{                                           // å­—èŠ‚è¾“å…¥ Binè¿ç®— Hexè¾“å‡º 
 	int i = 0;
-	static bool MesBit[64] = { 0 };        // Ã÷ÎÄ¶ş½øÖÆ´æ´¢¿Õ¼ä 64Î»
+	static bool MesBit[64] = { 0 };        // æ˜æ–‡äºŒè¿›åˆ¶å­˜å‚¨ç©ºé—´ 64ä½
 	static bool Temp[32] = { 0 };
-	static bool *MiL = &MesBit[0], *MiR = &MesBit[32]; // Ç°32Î» ºó32Î»¡¾×óÓÒÁ½²¿·Ö¡¿
+	static bool *MiL = &MesBit[0], *MiR = &MesBit[32]; // å‰32ä½ å32ä½ã€å·¦å³ä¸¤éƒ¨åˆ†ã€‘
 
-	ByteToBit(MesBit, MesIn, 64);                 // °ÑÃ÷ÎÄ»»³É¶ş½øÖÆ´æÈëMesBit¡¾×ªÎª2½øÖÆº¯Êı¡¿
+	ByteToBit(MesBit, MesIn, 64);                 // æŠŠæ˜æ–‡æ¢æˆäºŒè¿›åˆ¶å­˜å…¥MesBitã€è½¬ä¸º2è¿›åˆ¶å‡½æ•°ã€‘
 
-	TablePermute(MesBit, MesBit, IP_Table, 64);    // IPÖÃ»» ¡¾64->64Î»  Ö»·¢ÉúÎ»±ä»¯¡¿  ¡¾´«Öµ¹ıÈ¥¡¿
+	TablePermute(MesBit, MesBit, IP_Table, 64);    // IPç½®æ¢ ã€64->64ä½  åªå‘ç”Ÿä½å˜åŒ–ã€‘  ã€ä¼ å€¼è¿‡å»ã€‘
 
-	for (i = 0; i < 15; i++)                       // µü´ú16´Î 
+	for (i = 0; i < 15; i++)                       // è¿­ä»£16æ¬¡ 
 	{
-		BitsCopy(Temp, MiR, 32);             // ½»»»Î»ÖÃ
-		F_Change(MiR, SubKey[i]);           // Fº¯Êı±ä»»
-		Xor(MiR, MiL, 32);                   // µÃµ½Ri 
-		BitsCopy(MiL, Temp, 32);             // µÃµ½Li 
+		BitsCopy(Temp, MiR, 32);             // äº¤æ¢ä½ç½®
+		F_Change(MiR, SubKey[i]);           // Få‡½æ•°å˜æ¢
+		Xor(MiR, MiL, 32);                   // å¾—åˆ°Ri 
+		BitsCopy(MiL, Temp, 32);             // å¾—åˆ°Li 
 	}
 
-	//µÚ16ÂÖ¼ÓÃÜ
-	BitsCopy(Temp, MiR, 32);              // ÁÙÊ±´æ´¢
-	F_Change(MiR, SubKey[15]);           // Fº¯Êı±ä»»
+	//ç¬¬16è½®åŠ å¯†
+	BitsCopy(Temp, MiR, 32);              // ä¸´æ—¶å­˜å‚¨
+	F_Change(MiR, SubKey[15]);           // Få‡½æ•°å˜æ¢
 	Xor(MiL, MiR, 32);
-	BitsCopy(MiR, Temp, 32);              //´ËÂÖ²»½øĞĞ½»»»  ÓÒ°ë²¿·Ö»¹ÊÇ×÷ÎªÓÒ°ë²¿·Ö
+	BitsCopy(MiR, Temp, 32);              //æ­¤è½®ä¸è¿›è¡Œäº¤æ¢  å³åŠéƒ¨åˆ†è¿˜æ˜¯ä½œä¸ºå³åŠéƒ¨åˆ†
 
-	//F_Change(MiR,SubKey[15]);           // Fº¯Êı±ä»»
+	//F_Change(MiR,SubKey[15]);           // Få‡½æ•°å˜æ¢
 	//Xor(MiL,MiR,32);                 
 
 
@@ -277,21 +277,21 @@ void PlayDes(char MesOut[8], char MesIn[8])  // Ö´ĞĞDES¼ÓÃÜ
 	BitToHex(MesOut, MesBit, 64);
 }
 
-// Ö´ĞĞDES½âÃÜ
-void KickDes(char MesOut[8], char MesIn[8])       // Ö´ĞĞDES½âÃÜ
-{												// HexÊäÈë BinÔËËã ×Ö½ÚÊä³ö 
+// æ‰§è¡ŒDESè§£å¯†
+void KickDes(char MesOut[8], char MesIn[8])       // æ‰§è¡ŒDESè§£å¯†
+{												// Hexè¾“å…¥ Binè¿ç®— å­—èŠ‚è¾“å‡º 
 	int i = 0;
-	static bool MesBit[64] = { 0 };        // ÃÜÎÄ¶ş½øÖÆ´æ´¢¿Õ¼ä 64Î»
+	static bool MesBit[64] = { 0 };        // å¯†æ–‡äºŒè¿›åˆ¶å­˜å‚¨ç©ºé—´ 64ä½
 	static bool Temp[32] = { 0 };
-	static bool *MiL = &MesBit[0], *MiR = &MesBit[32]; // Ç°32Î» ºó32Î»
-	HexToBit(MesBit, MesIn, 64);                 // °ÑÃÜÎÄ»»³É¶ş½øÖÆ´æÈëMesBit
-	TablePermute(MesBit, MesBit, IP_Table, 64);    // IPÖÃ»» 
+	static bool *MiL = &MesBit[0], *MiR = &MesBit[32]; // å‰32ä½ å32ä½
+	HexToBit(MesBit, MesIn, 64);                 // æŠŠå¯†æ–‡æ¢æˆäºŒè¿›åˆ¶å­˜å…¥MesBit
+	TablePermute(MesBit, MesBit, IP_Table, 64);    // IPç½®æ¢ 
 
-	//ÏÈ¶Ô×îºóÒ»ÂÖ¼ÓÃÜµÄµÚ16ÂÖ½âÃÜ
-	BitsCopy(Temp, MiR, 32);              // ÁÙÊ±´æ´¢ ÓÒ°ë²¿·Ö MiR
-	F_Change(MiR, SubKey[15]);           // Fº¯Êı±ä»»
+	//å…ˆå¯¹æœ€åä¸€è½®åŠ å¯†çš„ç¬¬16è½®è§£å¯†
+	BitsCopy(Temp, MiR, 32);              // ä¸´æ—¶å­˜å‚¨ å³åŠéƒ¨åˆ† MiR
+	F_Change(MiR, SubKey[15]);           // Få‡½æ•°å˜æ¢
 	Xor(MiL, MiR, 32);
-	BitsCopy(MiR, Temp, 32);             //´ËÂÖ²»½øĞĞ½»»»  ÓÒ°ë²¿·Ö»¹ÊÇ×÷ÎªÓÒ°ë²¿·Ö
+	BitsCopy(MiR, Temp, 32);             //æ­¤è½®ä¸è¿›è¡Œäº¤æ¢  å³åŠéƒ¨åˆ†è¿˜æ˜¯ä½œä¸ºå³åŠéƒ¨åˆ†
 
 	for (i = 14; i >= 0; i--)
 	{
